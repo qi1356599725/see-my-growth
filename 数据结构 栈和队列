@@ -1,0 +1,494 @@
+栈
+定义：是只允许在一端进行插入或删除的线性表。首先栈是一种线性表，但限定这种线性表只能在某一端进行插入和删除操作
+顺序栈
+顺序栈定义
+采用顺序存储的栈称为顺序栈，它利用一组地址连续的存储单元存放自栈底到栈顶的数据元素，同时附设一个指针（top）指示当前栈顶元素的位置
+#define MaxSize 10
+typedef struct {
+	int data[MaxSize];
+	int top;
+}SqStack;
+1
+2
+3
+4
+5
+顺序栈初始化
+//初始化
+void InitStack(SqStack& S) {
+	S.top = -1;  //data[0]还没有放数据元素
+}
+1
+2
+3
+4
+入栈
+//入栈
+bool Push(SqStack& S, int x) {
+	if (S.top == MaxSize - 1)
+		return false;
+	S.top = S.top + 1;//初始指向data[-1]
+	S.data[S.top] = x;
+	//等价于
+	//S.data[++S.top] = x;
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+出栈
+//出栈
+bool Pop(SqStack& S, int& x) {
+	if (S.top == -1)
+		return false;
+	x = S.data[S.top];
+	S.top = S.top - 1;
+	//等价于
+	//x = S.data[S.top--];
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+读栈顶元素
+//读栈顶元素
+bool GetTop(SqStack S, int& x) {
+	if (S.top == -1)
+		return false;
+	x = S.data[S.top];
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+判断栈是否为空
+//判断栈是否为空
+bool StackEmpty(SqStack S) {
+	if (S.top == -1) //栈空
+		return true;
+	else
+		return false;
+}
+1
+2
+3
+4
+5
+6
+7
+共享栈
+定义
+利用栈底位置相对不变的特征，可让两个顺序栈共享一个一维数组空间，将两个栈的栈底分别设置在共享空间的两端，两个栈顶向共享空间的中间延伸
+#define MaxSize 10
+
+typedef struct {
+	int data[MaxSize];
+	int top0;
+	int top1;
+}ShStack;
+
+ShStack s; //全局变量
+1
+2
+3
+4
+5
+6
+7
+8
+9
+初始化
+//初始化栈
+void InitStack(ShStack& s) {
+	s.top1 = MaxSize;  //上
+	s.top0 = -1;//下
+}
+1
+2
+3
+4
+5
+入栈
+//入栈
+int push(int i, int x) {
+	if (i < 0 || i>1) {
+		cout << "栈号输入不对" << endl;
+		exit(0);
+	}
+	if (s.top1 - s.top0 == 1) {
+		cout << "栈满了" << endl;
+		return 0;
+	}
+	switch (i)
+	{
+	case 0:s.data[++s.top0] = x;
+		break;
+	case 1:s.data[--s.top1] = x;
+		break;
+	}
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+出栈
+//出栈
+int pop(int i) {
+	if (i < 0 || i>1) {
+		cout << "栈号输入错误" << endl;
+		exit(0);
+	}
+	switch (i) {
+	case 0:
+		if (s.top0 == -1) {
+			cout << "栈空" << endl;
+		}
+		else {
+			//return s.data[s.top0--];
+			cout << s.data[s.top0--] << endl;
+		}
+		break;
+	case 1:
+		if (s.top1 == MaxSize) {
+			cout << "栈空" << endl;
+		}
+		else {
+			//return s.data[s.top1++];
+			cout << s.data[s.top1++] << endl;
+		}
+		break;
+	}
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+链栈
+采用链式存储的栈称为链栈，链栈的优点是便于多个栈共享存储空间和提高其效率，且不存在栈满上溢的情况。
+类似单链表的头插法
+
+队列
+顺序队列
+定义
+队列的顺序实现是指分配一块连续的存储单元存放队列中的元素，并附设两个指针：队头指针 front指向队头元素，队尾指针 rear 指向队尾元素的下一个位置
+#define MaxSize 10
+typedef struct {
+	int data[MaxSize];
+	int front, rear; //队头和队尾指针
+}SqQueue;
+1
+2
+3
+4
+5
+初始化
+//初始化
+void InitQueue(SqQueue& Q) {
+	Q.rear = Q.front = 0;
+}
+1
+2
+3
+4
+入队
+//入队
+bool EnQueue(SqQueue& Q, int x) {
+	if ((Q.rear + 1) % MaxSize == Q.front) //牺牲一个节点空间
+		return false;
+	Q.data[Q.rear] = x;
+	Q.rear = (Q.rear + 1) % MaxSize;
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+出队
+//出队
+bool DeQueue(SqQueue& Q, int& x) {
+	if (Q.rear == Q.front) //判断队空
+		return false;
+	x = Q.data[Q.front];
+	Q.front = (Q.front + 1) % MaxSize;
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+获取队头元素
+//获取队头元素
+bool GetHead(SqQueue Q, int& x) {
+	if (Q.rear == Q.front)
+		return false;
+	x = Q.data[Q.front];
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+判断队列是否为空
+//判断队列是否为空
+bool QueueEmpty(SqQueue Q) {
+	if (Q.rear == Q.front) //对空条件
+		return true;
+	else
+		return false;
+}
+1
+2
+3
+4
+5
+6
+7
+队列链式存储
+定义
+队列的链式存储结构表示为链队列，它实际上是一个同时带有队头指针和队尾指针的单链表，只不过它只能尾进头出而已
+typedef struct LinkNode {
+	int data;
+	struct LinkNode* next;
+}LinkNode;
+
+typedef struct {
+	LinkNode* front, * rear; //队头和队尾指针
+}LinkQueue;
+1
+2
+3
+4
+5
+6
+7
+8
+初始化
+//初始化
+void InitQueue(LinkQueue& Q) {
+	Q.front = Q.rear = (LinkNode*)malloc(sizeof(LinkNode));
+	Q.front->next = NULL;
+}
+1
+2
+3
+4
+5
+入队
+//入队
+void EnQueue(LinkQueue& Q, int x) {
+	LinkNode* s = (LinkNode*)malloc(sizeof(LinkNode));
+	s->data = x;
+	s->next = NULL;
+	Q.rear->next = s;
+	Q.rear = s;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+出队
+//出队
+bool DeQueue(LinkQueue& Q, int& x) {
+	if (Q.front == Q.rear)
+		return false;  //空队
+	LinkNode* p = Q.front->next;
+	x = p->data;
+	Q.front->next = p->next;
+	if (Q.rear == p)
+		Q.rear = Q.front;
+	free(p);
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+判断队列是否为空
+//判断队列是否为空
+bool IsEmpty(LinkQueue Q) {
+	if (Q.front == Q.rear)
+		return true;
+	else
+		return false;
+}
+1
+2
+3
+4
+5
+6
+7
+队列链式存储（不带头结点）
+定义
+typedef struct LinkNode {
+	int data;
+	struct LinkNode* next;
+}LinkNode;
+
+typedef struct {
+	LinkNode* front, * rear; //队头和队尾指针
+}LinkQueue;
+1
+2
+3
+4
+5
+6
+7
+8
+初始化
+//初始化
+void InitQueue(LinkQueue& Q) {
+	Q.front = NULL;
+	Q.rear = NULL;
+}
+1
+2
+3
+4
+5
+入队
+//入队(不带头结点)
+void EnQueue(LinkQueue& Q, int x) {
+	LinkNode* s = (LinkNode*)malloc(sizeof(LinkNode));
+	s->data = x;
+	s->next = NULL;
+	if (Q.front == NULL) {
+		Q.front = s;
+		Q.rear = s;
+	} else {
+		Q.rear->next = s;
+		Q.rear = s;
+	}
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+出队
+//出队(不带头结点)
+bool DeQueue(LinkQueue& Q, int& x) {
+	if (Q.front == NULL)
+		return false;
+	LinkNode* p = Q.front;
+	x = p->data;
+	Q.front = p->next;
+	if (Q.rear == p) { //此次是最后一个节点出队
+		Q.front = NULL;
+		Q.rear = NULL;
+	}
+	free(p);
+	return true;
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+判断队列是否为空
+//判断队列是否为空
+bool IsEmpty(LinkQueue Q) {
+	if (Q.rear == NULL)
+		return true;
+	else
+		return false;
+}
+————————————————
+版权声明：本文为CSDN博主「满级小白」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/m0_57025749/article/details/124408260
